@@ -1,0 +1,12 @@
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\start.scr
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\PluginAutoCad.dll
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\PluginAutoCad.pdb
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\Newtonsoft.Json.dll
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\Newtonsoft.Json.xml
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.csproj.AssemblyReference.cache
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.LoginForm.resources
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.csproj.GenerateResource.cache
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.csproj.CoreCompileInputs.cache
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAu.BC2F38CF.Up2Date
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.dll
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.pdb

@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace PluginAutoCad.Core
+{
+    public static class Session
+    {
+        public static string GeoBaseUrl { get; set; }
+
+        public static string Token { get; set; }
+    }
+}

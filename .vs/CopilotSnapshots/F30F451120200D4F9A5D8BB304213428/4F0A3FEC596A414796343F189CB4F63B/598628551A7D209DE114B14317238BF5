@@ -1,0 +1,51 @@
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Runtime;
+using PluginAutoCad.Core;
+using PluginAutoCad.Services;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace PluginAutoCad
+{
+    public class GISCommands
+    {
+        [CommandMethod("GISLOGIN")]
+        public async void GisLogin()
+        {
+            var ed = Application.DocumentManager.MdiActiveDocument.Editor;
+
+            try
+            {
+                using (var form = new LoginForm())
+                {
+                    if (form.ShowDialog() == DialogResult.OK && Session.IsLoggedIn)
+                    {
+                        ed.WriteMessage($"\nĐăng nhập thành công với user: {Session.Username}");
+
+                        // Tự động load dữ liệu sau khi login
+                        await LoadGeoServerLayers();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage($"\nLỗi: {ex.Message}");
+            }
+        }
+
+        private async Task LoadGeoServerLayers()
+        {
+            var ed = Application.DocumentManager.MdiActiveDocument.Editor;
+            ed.WriteMessage("\nĐang tải danh sách layer từ GeoServer...");
+
+            var geoService = new GeoServerService();
+            string capabilities = await geoService.LoadWMS();
+
+            // TODO: Parse XML và hiển thị danh sách layer lên Palette hoặc Form
+            ed.WriteMessage("\nĐã nhận GetCapabilities từ GeoServer.");
+
+            // Sau này bạn có thể mở một Palette để chọn layer và vẽ lên AutoCAD
+        }
+    }
+}

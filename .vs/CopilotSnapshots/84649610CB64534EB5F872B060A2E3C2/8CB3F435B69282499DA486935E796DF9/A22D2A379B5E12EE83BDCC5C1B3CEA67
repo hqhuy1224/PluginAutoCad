@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PluginAutoCad.Services
+{
+    public static class ServiceDetector
+    {
+        public static string Detect(string url)
+        {
+            url = url.ToLower();
+
+            if (url.Contains("wms"))
+                return "WMS";
+
+            if (url.Contains("wfs"))
+                return "WFS";
+
+            if (url.Contains("wmts"))
+                return "WMTS";
+
+            if (url.Contains("tms"))
+                return "TMS";
+
+            return "UNKNOWN";
+        }
+    }
+}
