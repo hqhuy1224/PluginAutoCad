@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 
 namespace PluginAutoCad.Services
 {
@@ -26,7 +27,7 @@ namespace PluginAutoCad.Services
                 // Tạo RasterImageDef
                 var imageDef = new RasterImageDef();
                 imageDef.SourceFileName = imagePath;
-                imageDef.Load();   
+                imageDef.Load();
 
                 string defName = "WMS_" + DateTime.Now.Ticks;
                 ObjectId defId = imageDict.SetAt(defName, imageDef);
@@ -53,14 +54,28 @@ namespace PluginAutoCad.Services
                 return rasterId;
             }
         }
+
         // hàm vẽ GeoJSON lên AutoCAD
         public static void DrawGeoJsonToCad(string json)
         {
             var doc = Application.DocumentManager.MdiActiveDocument;
             var db = doc.Database;
 
-            var obj = JObject.Parse(json);
-            var features = obj["features"];
+            JObject geojson;
+
+            try
+            {
+                geojson = JObject.Parse(json);
+            }
+            catch
+            {
+                throw new Exception("Invalid GeoJSON format");
+            }
+
+            var features = geojson["features"];
+
+            if (features == null)
+                throw new Exception("GeoJSON missing 'features'");
 
             using (var tr = db.TransactionManager.StartTransaction())
             {
@@ -70,64 +85,30 @@ namespace PluginAutoCad.Services
                 foreach (var feature in features)
                 {
                     var geom = feature["geometry"];
+                    var props = feature["properties"];
                     string type = geom["type"].ToString();
 
-                    // POLYGON
-                    if (type == "Polygon")
+                    switch (type)
                     {
-                        var ring = geom["coordinates"][0];
+                        case "Point":
+                            DrawPoint(geom, props, db, btr, tr);
+                            break;
 
-                        Polyline pl = new Polyline();
+                        case "LineString":
+                            DrawLineString(geom, props, db, btr, tr);
+                            break;
 
-                        int i = 0;
-                        foreach (var p in ring)
-                        {
-                            double x = (double)p[0];
-                            double y = (double)p[1];
+                        case "Polygon":
+                            DrawPolygon(geom, props, db, btr, tr);
+                            break;
 
-                            pl.AddVertexAt(i, new Point2d(x, y), 0, 0, 0);
-                            i++;
-                        }
+                        case "MultiLineString":
+                            DrawMultiLineString(geom, props, db, btr, tr);
+                            break;
 
-                        pl.Closed = true;
-
-                        btr.AppendEntity(pl);
-                        tr.AddNewlyCreatedDBObject(pl, true);
-                    }
-
-                    // LINESTRING
-                    else if (type == "LineString")
-                    {
-                        var line = geom["coordinates"];
-
-                        Polyline pl = new Polyline();
-
-                        int i = 0;
-                        foreach (var p in line)
-                        {
-                            double x = (double)p[0];
-                            double y = (double)p[1];
-
-                            pl.AddVertexAt(i, new Point2d(x, y), 0, 0, 0);
-                            i++;
-                        }
-
-                        btr.AppendEntity(pl);
-                        tr.AddNewlyCreatedDBObject(pl, true);
-                    }
-
-                    // POINT
-                    else if (type == "Point")
-                    {
-                        var p = geom["coordinates"];
-
-                        double x = (double)p[0];
-                        double y = (double)p[1];
-
-                        DBPoint pt = new DBPoint(new Point3d(x, y, 0));
-
-                        btr.AppendEntity(pt);
-                        tr.AddNewlyCreatedDBObject(pt, true);
+                        case "MultiPolygon":
+                            DrawMultiPolygon(geom, props, db, btr, tr);
+                            break;
                     }
                 }
 
@@ -135,5 +116,166 @@ namespace PluginAutoCad.Services
             }
         }
 
+        private static void DrawPoint(JToken geom, JToken properties, Database db, BlockTableRecord btr, Transaction tr)
+        {
+            var coord = geom["coordinates"];
+
+            double x = (double)coord[0];
+            double y = (double)coord[1];
+
+            DBPoint pt = new DBPoint(new Point3d(x, y, 0));
+
+            btr.AppendEntity(pt);
+            tr.AddNewlyCreatedDBObject(pt, true);
+
+            // attach GIS attributes
+            AttachAttributes(db, tr, pt, properties);
+        }
+
+        private static void DrawLineString(JToken geom, JToken properties, Database db, BlockTableRecord btr, Transaction tr)
+        {
+            var coords = geom["coordinates"];
+
+            Polyline pl = new Polyline();
+
+            int i = 0;
+
+            foreach (var p in coords)
+            {
+                double x = (double)p[0];
+                double y = (double)p[1];
+
+                pl.AddVertexAt(i++, new Point2d(x, y), 0, 0, 0);
+            }
+
+            pl.Closed = false;
+
+            btr.AppendEntity(pl);
+            tr.AddNewlyCreatedDBObject(pl, true);
+
+            // attach GIS attribute
+            AttachAttributes(db, tr, pl, properties);
+        }
+
+        private static void DrawPolygon(JToken geom, JToken properties, Database db, BlockTableRecord btr, Transaction tr)
+        {
+            var rings = geom["coordinates"];
+
+            foreach (var ring in rings)
+            {
+                Polyline pl = new Polyline();
+
+                int i = 0;
+
+                foreach (var p in ring)
+                {
+                    double x = (double)p[0];
+                    double y = (double)p[1];
+
+                    pl.AddVertexAt(i++, new Point2d(x, y), 0, 0, 0);
+                }
+
+                pl.Closed = true;
+
+                btr.AppendEntity(pl);
+                tr.AddNewlyCreatedDBObject(pl, true);
+
+                AttachAttributes(db, tr, pl, properties);
+            }
+        }
+
+        private static void DrawMultiLineString(JToken geom, JToken properties, Database db, BlockTableRecord btr, Transaction tr)
+        {
+            var lines = geom["coordinates"];
+
+            foreach (var line in lines)
+            {
+                Polyline pl = new Polyline();
+
+                int i = 0;
+
+                foreach (var p in line)
+                {
+                    double x = (double)p[0];
+                    double y = (double)p[1];
+
+                    pl.AddVertexAt(i++, new Point2d(x, y), 0, 0, 0);
+                }
+
+                pl.Closed = false;
+
+                btr.AppendEntity(pl);
+                tr.AddNewlyCreatedDBObject(pl, true);
+
+                AttachAttributes(db, tr, pl, properties);
+            }
+        }
+
+        private static void DrawMultiPolygon(JToken geom, JToken properties, Database db, BlockTableRecord btr, Transaction tr)
+        {
+            var polygons = geom["coordinates"];
+
+            foreach (var poly in polygons)
+            {
+                foreach (var ring in poly)
+                {
+                    Polyline pl = new Polyline();
+
+                    int i = 0;
+
+                    foreach (var p in ring)
+                    {
+                        double x = (double)p[0];
+                        double y = (double)p[1];
+
+                        pl.AddVertexAt(i++, new Point2d(x, y), 0, 0, 0);
+                    }
+
+                    pl.Closed = true;
+
+                    btr.AppendEntity(pl);
+                    tr.AddNewlyCreatedDBObject(pl, true);
+
+                    AttachAttributes(db, tr, pl, properties);
+                }
+            }
+        }
+
+
+        public static void AttachAttributes(Database db, Transaction tr, Entity ent, JToken properties)
+        {
+            if (properties == null)
+                return;
+
+            const string appName = "GIS_ATTR";
+
+            // đăng ký RegApp
+            var regTable = (RegAppTable)tr.GetObject(db.RegAppTableId, OpenMode.ForRead);
+
+            if (!regTable.Has(appName))
+            {
+                regTable.UpgradeOpen();
+
+                RegAppTableRecord reg = new RegAppTableRecord();
+                reg.Name = appName;
+
+                regTable.Add(reg);
+                tr.AddNewlyCreatedDBObject(reg, true);
+            }
+
+            ResultBuffer rb = new ResultBuffer();
+
+            rb.Add(new TypedValue(1001, appName));
+
+            foreach (var prop in properties)
+            {
+                string key = prop.Path.Split('.').Last();
+                string value = prop.First.ToString();
+
+                rb.Add(new TypedValue(1000, key + "=" + value));
+            }
+
+            ent.XData = rb;
+        }
     }
 }

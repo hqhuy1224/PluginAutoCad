@@ -1,9 +1,0 @@
-﻿namespace PluginAutoCad.Core
-{
-    public static class Session
-    {
-        public static string AccessToken { get; set; }
-
-        public static string GeoBaseUrl { get; set; }
-    }
-}

@@ -30,10 +30,6 @@ namespace PluginAutoCad
 
                 ed.WriteMessage($"\n✓ Đăng nhập thành công: {Session.Username}");
 
-                //using (var serviceForm = new ServiceForm())   
-                //{
-                //    serviceForm.ShowDialog();
-                //}
             }
             catch (System.Exception ex)
             {

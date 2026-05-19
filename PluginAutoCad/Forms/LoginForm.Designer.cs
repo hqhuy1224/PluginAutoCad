@@ -76,7 +76,7 @@
             this.txturl.Name = "txturl";
             this.txturl.Size = new System.Drawing.Size(162, 20);
             this.txturl.TabIndex = 3;
-            this.txturl.Text = "http://localhost:8080/geoserver/HoSoGis/wms";
+            this.txturl.Text = "http://localhost/geoserver/HoSoGis/wms";
             // 
             // txtUsername
             // 

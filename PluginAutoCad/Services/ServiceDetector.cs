@@ -15,12 +15,12 @@ namespace PluginAutoCad.Services
 
             if (url.EndsWith("/wms"))
             {
-                return (url.Replace("/wms", ""), "wms");
+                return (url, "wms");
             }
 
             if (url.EndsWith("/wfs"))
             {
-                return (url.Replace("/wfs", ""), "wfs");
+                return (url, "wfs");
             }
 
             throw new Exception("Geo URL must end with /wms or /wfs");

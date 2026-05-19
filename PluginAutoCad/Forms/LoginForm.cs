@@ -95,11 +95,11 @@ namespace PluginAutoCad
             }
         }
 
-        // hàm load layer WFS và vẽ lên AutoCAD
+        //hàm load layer WFS và vẽ lên AutoCAD
         private async Task LoadAndDrawWfsLayers()
         {
             var ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
-            
+
             try
             {
                 var geo = new GeoService(Session.AccessToken);
@@ -113,18 +113,22 @@ namespace PluginAutoCad
                     return;
                 }
 
-                string layerName = layers[0];
+                //string layerName = layers[0];
+                foreach (var item in layers)
+                {
+                    ed.WriteMessage($"\nĐang load WFS layer: {item}");
 
-                ed.WriteMessage($"\nĐang load WFS layer: {layerName}");
+                    string geojson = await geo.GetWfsFeaturesAsync(
+                        Session.GeoBaseUrl,
+                        item
+                    );
 
-                string geojson = await geo.GetWfsFeaturesAsync(
-                    Session.GeoBaseUrl,
-                    layerName
-                );
+                    GeoCadRenderer.DrawGeoJsonToCad(geojson);
 
-                GeoCadRenderer.DrawGeoJsonToCad(geojson);
+                    ed.WriteMessage($"\n✓ Đã vẽ layer WFS: {item}");
+                }
 
-                ed.WriteMessage($"\n✓ Đã vẽ layer WFS: {layerName}");
+               
             }
             catch (Exception ex)
             {
@@ -136,7 +140,7 @@ namespace PluginAutoCad
         //button login
         private async void BtnLogin_Click(object sender, EventArgs e)
         {
-            string authUrl = "http://localhost:8081"; 
+            string authUrl = "http://localhost/auth"; 
             string geoUrl = txturl.Text.Trim();       
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Text.Trim();
@@ -156,10 +160,19 @@ namespace PluginAutoCad
 
                 MessageBox.Show("Login OK" + "");
 
-                await Task.WhenAll(
-                     LoadAndDrawWmsLayers(),
-                     LoadAndDrawWfsLayers()
-                );
+                //await Task.WhenAll(
+                //     LoadAndDrawWmsLayers(),
+                //     LoadAndDrawWfsLayers()
+                //);
+
+                if (Session.ServiceType == "wms")
+                {
+                    await LoadAndDrawWmsLayers();
+                }
+                else if (Session.ServiceType == "wfs")
+                {
+                    await LoadAndDrawWfsLayers();
+                }
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
