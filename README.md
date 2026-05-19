@@ -60,8 +60,8 @@ http://localhost/geoserver/HoSoGis/wfs
     "WFS": "http://localhost/geoserver/HoSoGis/wfs"
   }
 }
-
-## Author
+```
+## Tác giả
 
 👨‍💻 Developed by: Huy Hoàng  
 📌 Project: PluginAutoCad - GIS Layer Loader  
