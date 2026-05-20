@@ -4,6 +4,7 @@ C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\PluginAuto
 C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\Newtonsoft.Json.dll
 C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\bin\Debug\Newtonsoft.Json.xml
 C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.csproj.AssemblyReference.cache
+C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.g.resources
 C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.LoginForm.resources
 C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.csproj.GenerateResource.cache
 C:\Users\ekmapdata\source\repos\PluginAutoCad\PluginAutoCad\obj\Debug\PluginAutoCad.csproj.CoreCompileInputs.cache

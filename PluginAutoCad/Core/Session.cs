@@ -7,6 +7,8 @@ namespace PluginAutoCad.Core
         // Auth
         public static string AccessToken;
 
+        public static string RefeshToken;
+
         // GIS
         public static string GeoBaseUrl;
 

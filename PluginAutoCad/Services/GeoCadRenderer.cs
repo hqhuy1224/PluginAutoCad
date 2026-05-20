@@ -54,6 +54,27 @@ namespace PluginAutoCad.Services
                 return rasterId;
             }
         }
+        // hàm tạo layer nếu chưa tồn tại 
+        private static void EnsureLayer(Database db, Transaction tr, string layerName, short colorIndex)
+        {
+            LayerTable lt = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
+
+            if (!lt.Has(layerName))
+            {
+                lt.UpgradeOpen();
+
+                LayerTableRecord ltr = new LayerTableRecord
+                {
+                    Name = layerName,
+                    Color = Autodesk.AutoCAD.Colors.Color.FromColorIndex(
+                        Autodesk.AutoCAD.Colors.ColorMethod.ByAci,
+                        colorIndex)
+                };
+
+                lt.Add(ltr);
+                tr.AddNewlyCreatedDBObject(ltr, true);
+            }
+        }
 
         // hàm vẽ GeoJSON lên AutoCAD
         public static void DrawGeoJsonToCad(string json)
@@ -116,6 +137,14 @@ namespace PluginAutoCad.Services
             }
         }
 
+        // hàm áp dụng style cho đối tượng CAD
+        private static void ApplyStyle(Entity ent, string layerName, short colorIndex, LineWeight lw = LineWeight.LineWeight025)
+        {
+            ent.Layer = layerName;
+            ent.ColorIndex = colorIndex;
+            ent.LineWeight = lw;
+        }
+
         private static void DrawPoint(JToken geom, JToken properties, Database db, BlockTableRecord btr, Transaction tr)
         {
             var coord = geom["coordinates"];
@@ -124,6 +153,9 @@ namespace PluginAutoCad.Services
             double y = (double)coord[1];
 
             DBPoint pt = new DBPoint(new Point3d(x, y, 0));
+
+            EnsureLayer(db, tr, "GIS_POINT", 1);
+            ApplyStyle(pt, "GIS_POINT", 1);
 
             btr.AppendEntity(pt);
             tr.AddNewlyCreatedDBObject(pt, true);
@@ -149,6 +181,9 @@ namespace PluginAutoCad.Services
             }
 
             pl.Closed = false;
+
+            EnsureLayer(db, tr, "GIS_LINE", 3);
+            ApplyStyle(pl, "GIS_LINE", 3, LineWeight.LineWeight030);
 
             btr.AppendEntity(pl);
             tr.AddNewlyCreatedDBObject(pl, true);
@@ -177,6 +212,9 @@ namespace PluginAutoCad.Services
 
                 pl.Closed = true;
 
+                EnsureLayer(db, tr, "GIS_POLYGON", 5);
+                ApplyStyle(pl, "GIS_POLYGON", 5, LineWeight.LineWeight005);
+
                 btr.AppendEntity(pl);
                 tr.AddNewlyCreatedDBObject(pl, true);
 
@@ -203,6 +241,9 @@ namespace PluginAutoCad.Services
                 }
 
                 pl.Closed = false;
+
+                EnsureLayer(db, tr, "GIS_LINE", 3);
+                ApplyStyle(pl, "GIS_LINE", 3);
 
                 btr.AppendEntity(pl);
                 tr.AddNewlyCreatedDBObject(pl, true);
@@ -232,6 +273,9 @@ namespace PluginAutoCad.Services
                     }
 
                     pl.Closed = true;
+
+                    EnsureLayer(db, tr, "GIS_POLYGON", 5);
+                    ApplyStyle(pl, "GIS_POLYGON", 5, LineWeight.LineWeight050);
 
                     btr.AppendEntity(pl);
                     tr.AddNewlyCreatedDBObject(pl, true);

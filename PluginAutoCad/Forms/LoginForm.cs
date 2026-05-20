@@ -16,6 +16,7 @@ namespace PluginAutoCad
         public LoginForm()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
         }
         public virtual IntPtr Token { get; }
 
@@ -186,5 +187,9 @@ namespace PluginAutoCad
             }
         }
 
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
