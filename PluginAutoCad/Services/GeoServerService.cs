@@ -55,7 +55,6 @@ namespace PluginAutoCad.Services
         }
 
 
-
         private string GetUsernameFromToken(string token)
         {
             var parts = token.Split('.');

@@ -46,11 +46,15 @@ namespace PluginAutoCad.Services
                 );
 
                 // Thêm vào Model Space
-                var btr = (BlockTableRecord)tr.GetObject(db.CurrentSpaceId, OpenMode.ForWrite);
+                var btr = (BlockTableRecord)tr.GetObject(
+                 SymbolUtilityServices.GetBlockModelSpaceId(db),
+                 OpenMode.ForWrite);
                 ObjectId rasterId = btr.AppendEntity(raster);
                 tr.AddNewlyCreatedDBObject(raster, true);
 
                 tr.Commit();
+                doc.Editor.Regen();
+                doc.Editor.Command("_.ZOOM", "_E");
                 return rasterId;
             }
         }
@@ -100,8 +104,11 @@ namespace PluginAutoCad.Services
 
             using (var tr = db.TransactionManager.StartTransaction())
             {
-                var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
-                var btr = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
+                //var bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+                //var btr = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
+                var btr = (BlockTableRecord)tr.GetObject(
+                SymbolUtilityServices.GetBlockModelSpaceId(db),
+                OpenMode.ForWrite);
 
                 foreach (var feature in features)
                 {
@@ -134,6 +141,8 @@ namespace PluginAutoCad.Services
                 }
 
                 tr.Commit();
+                doc.Editor.Regen();
+                doc.Editor.Command("_.ZOOM", "_E");
             }
         }
 
