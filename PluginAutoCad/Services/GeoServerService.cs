@@ -54,6 +54,8 @@ namespace PluginAutoCad.Services
             return await response.Content.ReadAsStringAsync();
         }
 
+
+
         private string GetUsernameFromToken(string token)
         {
             var parts = token.Split('.');
