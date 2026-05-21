@@ -26,10 +26,9 @@ namespace PluginAutoCad
                         if (loginForm.ShowDialog() != DialogResult.OK || !Session.IsLoggedIn)
                             return;
                     }
-                }
-
+                }               
                 ed.WriteMessage($"\n✓ Đăng nhập thành công: {Session.Username}");
-
+                Session.Clear();
             }
             catch (System.Exception ex)
             {

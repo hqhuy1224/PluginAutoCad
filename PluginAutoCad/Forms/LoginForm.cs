@@ -124,7 +124,7 @@ namespace PluginAutoCad
                         item
                     );
 
-                    GeoCadRenderer.DrawGeoJsonToCad(geojson);
+                    GeoCadRenderer.DrawGeoJsonToCad(geojson, item);
 
                     ed.WriteMessage($"\n✓ Đã vẽ layer WFS: {item}");
                 }

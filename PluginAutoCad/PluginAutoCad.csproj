@@ -71,6 +71,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AddPointAndSetPointStyle.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\RibbonSetup.cs" />
     <Compile Include="Core\Session.cs" />
