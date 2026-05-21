@@ -2,7 +2,7 @@
 
 ## Giới thiệu
 
-Plugin AutoCAD dùng để load và hiển thị dữ liệu GIS từ GeoServer thông qua hai dịch vụ WMS và WFS, tích hợp đăng nhập Keycloak (SSO) để phân quyền người dùng.Có thể tải xuống file .exe trong thư mục Output để tiến hành cài đặt
+Plugin AutoCAD dùng để load và hiển thị dữ liệu GIS từ GeoServer thông qua hai dịch vụ WMS và WFS, tích hợp đăng nhập Keycloak (SSO) để phân quyền người dùng.Có thể tải xuống file .exe trong thư mục Output để tiến hành cài đặt hoặc có thể copy thư mục PluginAutoCad.bundle nằm trong Installer/bundle/ sau đó paste vào thư mục ApplicationPlugins nơi lưu trữ plugin của bạn(thường sẽ nằm ở C:\ProgramData\Autodesk\ApplicationPlugins).
 
 ## Tính năng
 
